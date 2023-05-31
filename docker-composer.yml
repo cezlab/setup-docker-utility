@@ -1,0 +1,107 @@
+version: "3.7"
+
+services:
+  postgres:
+    container_name: postgres_service
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_DB}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres-data:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      docker-network:
+        ipv4_address: 172.28.0.2
+    restart: unless-stopped
+  
+  pgadmin:
+    container_name: pgadmin_service
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    volumes:
+       - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "9090:80"
+    networks:
+      docker-network:
+        ipv4_address: 172.28.0.3
+    restart: unless-stopped
+
+  mailhog:
+    container_name: mailhog_service
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      docker-network:
+        ipv4_address: 172.28.0.5
+
+  redis:
+    container_name: redis_service
+    image: redis
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    networks:
+      docker-network:
+        ipv4_address: 172.28.0.6
+
+  php-fpm:
+    container_name: php_fpm_service
+    image: cezlab/php-8.2-fpm
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - 9082:9000
+    restart: unless-stopped
+    volumes:
+      - '.:/var/www/html'
+      - '.docker/php.ini:/usr/local/etc/php/php.ini'
+    networks:
+      docker-network:
+        ipv4_address: 172.28.0.7
+
+  web_service:
+    container_name: web_service
+    image: nginx:latest
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    depends_on:
+      - php-fpm
+    links:
+      - php-fpm
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - '.:/var/www/html'
+      - '.docker/nginx.conf:/etc/nginx/conf.d/default.conf'
+    networks:
+      docker-network:
+        ipv4_address: 172.28.0.8
+volumes:
+  postgres-data:
+  pgadmin-data:
+networks:
+  docker-network:
+    name: docker-server-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
