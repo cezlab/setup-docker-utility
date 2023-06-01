@@ -1,42 +1,76 @@
 version: "3.7"
 
 services:
-  postgres:
-    container_name: postgres_service
-    image: postgres:latest
+  database:
+    container_name: database_service
+    image: mariadb:10.4
     environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_DB}
-      PGDATA: /data/postgres
-    volumes:
-       - postgres-data:/data/postgres
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_DB}
     ports:
-      - "5432:5432"
+      - 3306:3306
+    volumes:
+      - '.docker/mysql.cnf:/etc/mysql/conf.d/docker.cnf'
     networks:
-      docker-network:
+      docker-server:
         ipv4_address: 172.28.0.2
-    restart: unless-stopped
-  
-  pgadmin:
-    container_name: pgadmin_service
-    image: dpage/pgadmin4:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+
+  phpmyadmin:
+    container_name: phpmyadmin_service
+    image: phpmyadmin/phpmyadmin
     depends_on:
-      - postgres
+      - database
     links:
-      - postgres
-    volumes:
-       - pgadmin-data:/var/lib/pgadmin
+      - database
     ports:
-      - "9090:80"
+      - 9090:80
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      PMA_HOST: database
+      UPLOAD_LIMIT: '300M'
+      MAX_EXECUTION_TIME: '-1'
+      MEMORY_LIMIT: '-1'
     networks:
-      docker-network:
+      docker-server:
         ipv4_address: 172.28.0.3
-    restart: unless-stopped
+
+  # postgres database
+  # database:
+  #   container_name: database_service
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_USER: ${DATABASE_USER}
+  #     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+  #     POSTGRES_DB: ${DATABASE_DB}
+  #     PGDATA: /data/postgres
+  #   volumes:
+  #      - postgres-data:/data/postgres
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     docker-network:
+  #       ipv4_address: 172.28.0.2
+  #   restart: unless-stopped
+  
+  # pgadmin:
+  #   container_name: pgadmin_service
+  #   image: dpage/pgadmin4:latest
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
+  #   depends_on:
+  #     - database
+  #   links:
+  #     - database
+  #   volumes:
+  #      - pgadmin-data:/var/lib/pgadmin
+  #   ports:
+  #     - "9090:80"
+  #   networks:
+  #     docker-network:
+  #       ipv4_address: 172.28.0.3
+  #   restart: unless-stopped
 
   mailhog:
     container_name: mailhog_service

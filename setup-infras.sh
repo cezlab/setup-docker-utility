@@ -1,6 +1,7 @@
 DIR="./.docker"
 FILE_NGINX="./.docker/nginx.conf.dist"
 FILE_PHP="./.docker/php.ini.dist"
+FILE_MYSQL="./.docker/mysql.cnf.dist"
 FILE_DOCKER_COMPOSE="./docker-composer.yml"
 FILE_MAKEFILE="./Makefile"
 DOWNLOAD_URL="https://raw.githubusercontent.com/cezlab/setup-docker-utility/main"
@@ -45,4 +46,12 @@ if test -f "$FILE_PHP"; then
 else
     echo "Download ${FILE_PHP}"
     curl "${DOWNLOAD_URL}/.docker/php.ini.dist" --output ${FILE_PHP}
+fi
+
+echo "#5 - Check ${FILE_MYSQL} file"
+if test -f "$FILE_MYSQL"; then
+    echo "$FILE_MYSQL exists."
+else
+    echo "Download ${FILE_MYSQL}"
+    curl "${FILE_MYSQL}/.docker/mysql.cnf.dist" --output ${FILE_MYSQL}
 fi
