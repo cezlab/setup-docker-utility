@@ -96,9 +96,9 @@ services:
     container_name: php_fpm_service
     image: cezlab/php-8.2-fpm
     depends_on:
-      - postgres
+      - database
     links:
-      - postgres
+      - database
     ports:
       - 9082:9000
     restart: unless-stopped
