@@ -5,6 +5,7 @@ FILE_MYSQL="./.docker/mysql.cnf.dist"
 FILE_DOCKER_COMPOSE="./docker-compose.yml"
 FILE_MAKEFILE="./Makefile"
 FILE_DOCKER_ENV="./.docker/.docker.env"
+FILE_GITIGNORE=".gitignore"
 DOWNLOAD_URL="https://raw.githubusercontent.com/cezlab/setup-docker-utility/main"
 
 echo "#1 - Check Folder Docker Configuration"
