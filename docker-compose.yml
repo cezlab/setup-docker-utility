@@ -12,7 +12,7 @@ services:
     volumes:
       - '.docker/mysql.cnf:/etc/mysql/conf.d/docker.cnf'
     networks:
-      docker-server:
+      docker-network:
         ipv4_address: 172.28.0.2
 
   phpmyadmin:
@@ -31,7 +31,7 @@ services:
       MAX_EXECUTION_TIME: '-1'
       MEMORY_LIMIT: '-1'
     networks:
-      docker-server:
+      docker-network:
         ipv4_address: 172.28.0.3
 
   # postgres database
