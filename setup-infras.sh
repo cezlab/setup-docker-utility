@@ -64,3 +64,17 @@ else
     echo "Download ${FILE_MYSQL}"
     curl "${DOWNLOAD_URL}/.docker/.docker.env" --output ${FILE_DOCKER_ENV}
 fi
+
+echo "#8 - Check ${FILE_GITIGNORE} file"
+if test -f "$FILE_GITIGNORE"; then
+    echo "$FILE_GITIGNORE exists."
+else
+    echo "Write Content For ${FILE_GITIGNORE}"
+    cat > $FILE_GITIGNORE <<EOF
+.docker/mysql.cnf
+.docker/nginx.conf
+.docker/php.ini
+.docker/.env
+EOF
+fi
+
