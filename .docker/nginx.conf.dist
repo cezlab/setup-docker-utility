@@ -1,29 +1,25 @@
+upstream fastcgi_backend {
+  server php-fpm:9000;
+}
+
 server {
-    listen 443;
-    listen  [::]:443;
-    index index.php index.html;
-    server_name localhost;
-    error_log /var/log/nginx/error.log;
-    access_log /var/log/nginx/access.log;
-    root /var/www/html;
-    client_max_body_size 100M;
+  listen 80;
+  listen [::]:80;
+  server_name localhost;
+  set $MAGE_ROOT /var/www/html/wwwroot;
+  set $MAGE_DEBUG_SHOW_ARGS 0;
+  error_log /var/log/nginx/error.log;
+  access_log /var/log/nginx/access.log;
+  include /var/www/html/wwwroot/nginx.conf.sample;
+}
 
-    location / {
-        try_files $uri $uri/ /index.php?$args;
-    }
-
-    location ~ \.php$ {
-        try_files $uri =404;
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass php-fpm:9000;
-        fastcgi_index index.php;
-        include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
-    }
-
-    # Prevent PHP scripts from being executed inside the uploads folder.
-    location ~* /app/uploads/.*.php$ {
-        deny all;
-    }
+server {
+  listen 443;
+  listen [::]:443;
+  server_name localhost;
+  set $MAGE_ROOT /var/www/html/wwwroot;
+  set $MAGE_DEBUG_SHOW_ARGS 0;
+  error_log /var/log/nginx/error.log;
+  access_log /var/log/nginx/access.log;
+  include /var/www/html/wwwroot/nginx.conf.sample;
 }

@@ -34,44 +34,6 @@ services:
       docker-network:
         ipv4_address: 172.28.0.3
 
-  # postgres database
-  # database:
-  #   container_name: database_service
-  #   image: postgres:latest
-  #   environment:
-  #     POSTGRES_USER: ${DATABASE_USER}
-  #     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-  #     POSTGRES_DB: ${DATABASE_DB}
-  #     PGDATA: /data/postgres
-  #   volumes:
-  #      - postgres-data:/data/postgres
-  #   ports:
-  #     - "5432:5432"
-  #   networks:
-  #     docker-network:
-  #       ipv4_address: 172.28.0.2
-  #   restart: unless-stopped
-  
-  # pgadmin:
-  #   container_name: pgadmin_service
-  #   image: dpage/pgadmin4:latest
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
-  #   depends_on:
-  #     - database
-  #   links:
-  #     - database
-  #   volumes:
-  #      - pgadmin-data:/var/lib/pgadmin
-  #   ports:
-  #     - "9090:80"
-  #   networks:
-  #     docker-network:
-  #       ipv4_address: 172.28.0.3
-  #   restart: unless-stopped
-
   mailhog:
     container_name: mailhog_service
     image: mailhog/mailhog
@@ -103,7 +65,7 @@ services:
       - 9082:9000
     restart: unless-stopped
     volumes:
-      - '.:/var/www/html'
+      - './wwwroot:/var/www/html/wwwroot'
       - '.docker/php.ini:/usr/local/etc/php/php.ini'
     networks:
       docker-network:
@@ -124,11 +86,24 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - '.:/var/www/html'
+      - './wwwroot:/var/www/html/wwwroot'
       - '.docker/nginx.conf:/etc/nginx/conf.d/default.conf'
     networks:
       docker-network:
         ipv4_address: 172.28.0.8
+
+  elasticsearch:
+    container_name: elasticsearch_service
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    ports:
+      - 9200:9200
+    networks:
+      docker-network:
+        ipv4_address: 172.28.0.9
+
 volumes:
   postgres-data:
   pgadmin-data:

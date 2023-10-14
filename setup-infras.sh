@@ -6,7 +6,8 @@ FILE_DOCKER_COMPOSE="./docker-compose.yml"
 FILE_MAKEFILE="./Makefile"
 FILE_DOCKER_ENV="./.docker/.docker.env"
 FILE_GITIGNORE=".gitignore"
-DOWNLOAD_URL="https://raw.githubusercontent.com/cezlab/setup-docker-utility/main"
+FOLDER_WORK="wwwroot"
+DOWNLOAD_URL="https://raw.githubusercontent.com/cezlab/setup-docker-utility/magento"
 
 echo "#1 - Check Folder Docker Configuration"
 if [ -d "$DIR" ]; then
@@ -62,7 +63,7 @@ echo "#7 - Check ${FILE_DOCKER_ENV} file"
 if test -f "$FILE_DOCKER_ENV"; then
     echo "$FILE_DOCKER_ENV exists."
 else
-    echo "Download ${FILE_MYSQL}"
+    echo "Download ${FILE_DOCKER_ENV}"
     curl "${DOWNLOAD_URL}/.docker/.docker.env" --output ${FILE_DOCKER_ENV}
 fi
 
@@ -76,6 +77,13 @@ else
 .docker/nginx.conf
 .docker/php.ini
 .docker/.env
+./.env
 EOF
 fi
 
+echo "#9 - Create Working Dir"
+if [ -d "$FOLDER_WORK" ]; then
+   echo "$FOLDER_WORK exists."
+else
+   mkdir $FOLDER_WORK
+fi
